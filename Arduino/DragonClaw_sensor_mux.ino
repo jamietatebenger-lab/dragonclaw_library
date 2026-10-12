@@ -41,22 +41,14 @@ void setup()
 
   if (myMux.begin() == false)
   {
-    Serial.println("Mux not detected. Freezing...");
     while (1);
   }
-  Serial.println("Mux detected");
 
   //setup first finger
   myMux.setPort(0);
   status = mlx0.begin(mlx0_i2c, -1, Wire);
-  Serial.print("Start status: 0x");
-  if(status < 0x10) Serial.print("0"); //Pretty output
-  Serial.println(status, BIN);
   
   status = mlx1.begin(mlx1_i2c, -1, Wire);
-  Serial.print("Start status: 0x");
-  if(status < 0x10) Serial.print("0"); 
-  Serial.println(status, BIN);
   //gain and digital filtering set up in the begin() function. 
   mlx0.startBurst(0xF);
   mlx1.startBurst(0xF);
@@ -64,14 +56,8 @@ void setup()
   //setup second finger
   myMux.setPort(1);
   status = mlx0.begin(mlx0_i2c, -1, Wire);
-  Serial.print("Start status: 0x");
-  if(status < 0x10) Serial.print("0"); //Pretty output
-  Serial.println(status, BIN);
   
   status = mlx1.begin(mlx1_i2c, -1, Wire);
-  Serial.print("Start status: 0x");
-  if(status < 0x10) Serial.print("0"); 
-  Serial.println(status, BIN);  
   //gain and digital filtering set up in the begin() function. 
   mlx0.startBurst(0xF);
   mlx1.startBurst(0xF);
@@ -79,19 +65,10 @@ void setup()
   //setup thumb
   myMux.setPort(2);
   status = mlx2.begin(mlx2_i2c, -1, Wire);
-  Serial.print("Start status: 0x");
-  if(status < 0x10) Serial.print("0"); //Pretty output
-  Serial.println(status, BIN);
   
   status = mlx3.begin(mlx3_i2c, -1, Wire);
-  Serial.print("Start status: 0x");
-  if(status < 0x10) Serial.print("0"); 
-  Serial.println(status, BIN);
 
   status = mlx4.begin(mlx4_i2c, -1, Wire);
-  Serial.print("Start status: 0x");
-  if(status < 0x10) Serial.print("0"); 
-  Serial.println(status, BIN);
   mlx2.startBurst(0xF);
   mlx3.startBurst(0xF);
   mlx4.startBurst(0xF);
@@ -115,8 +92,10 @@ void loop()
   mlx4.readBurstData(data6); 
 
 //  uncomment to change data stream to binary
+  float timestamp = micros();
+  Serial.write((byte*)&timestamp, sizeof(timestamp));
   for(int idx=0; idx<7; idx++){
-    Serial.write((byte*)&data[idx], sizeof(data[idx]));
+    Serial.write((byte*)data[idx], sizeof(*data[idx]));
   } 
 
 //  // comment/uncomment to change data stream to ASCII

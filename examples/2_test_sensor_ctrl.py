@@ -1,41 +1,44 @@
 #   Copyright (c) Meta Platforms, Inc. and affiliates.
-from polymetis import RobotInterface, GripperInterface
-from dragonclaw_library import DragonClawSensor
+import argparse
 import time
+
+from polymetis import RobotInterface
+from dragonclaw_library import DragonClawSensor
 import numpy as np
 import torch
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--robot-ip", required=True)
+args = parser.parse_args()
+
 sensor = DragonClawSensor("/dev/ttyACM0")
-sensorData = sensor.readSensor()
-base_z_mT = np.mean(sensorData.z_mT[0:3])
+robot = RobotInterface(ip_address=args.robot_ip)
 
-robot = RobotInterface(
-    ip_address="000.00.0.0",
-)
+ee_pos_move_up = torch.Tensor([0, 0, 0.05])
+ee_pos_move_down = torch.Tensor([0, 0, -0.05])
 
-ee_pos_moveUp = torch.Tensor([0,0,0.05])
-ee_pos_moveDown = torch.Tensor([0,0,-0.05])
+try:
+    while True:
+        sensor_data = sensor.read_sensor()
+        if sensor_data is None:
+            time.sleep(0.01)
+            continue
 
-while True:
-    ee_current_pos = robot.get_ee_pose()
-
-    if base_z_mT < 0:
-        print(f"\nMoving UP ...\n")
-        state_log = robot.move_to_ee_pose(
-            position=ee_pos_moveUp, orientation=None, time_to_go=2.0, delta=True
-        )
-        time.sleep(0.5)
-    elif base_z_mT > 0:
-        print(f"\nMoving DOWN ...\n")
-        state_log = robot.move_to_ee_pose(
-            position=ee_pos_moveDown, orientation=None, time_to_go=2.0, delta=True
-        )
-        time.sleep(0.5)
-    time.sleep(0.1)
-
-time.sleep(2)
-
-gripper.release()
-
-gripper.stop()
-sensor.stop()
+        base_z_uT = np.mean(sensor_data.z_uT[0:3])
+        if base_z_uT < 0:
+            print("\nMoving UP ...\n")
+            robot.move_to_ee_pose(
+                position=ee_pos_move_up, orientation=None, time_to_go=2.0, delta=True
+            )
+            time.sleep(0.5)
+        elif base_z_uT > 0:
+            print("\nMoving DOWN ...\n")
+            robot.move_to_ee_pose(
+                position=ee_pos_move_down, orientation=None, time_to_go=2.0, delta=True
+            )
+            time.sleep(0.5)
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    pass
+finally:
+    sensor.stop()

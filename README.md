@@ -26,7 +26,7 @@ pip install -e .
 
 6. If mounting the DragonClaw to a robot arm, specifically a [Franka Emika Panda arm](https://www.franka.de/), use two M6 bolts to attach the DragonClaw palm to the end effector. 
 
-7. Use 2_test_sensor_ctrl.py to verify that the sensor readings can be used to control the movement of the arm. Make sure to install [Polymetis](https://facebookresearch.github.io/fairo/polymetis/).
+7. Use `python examples/2_test_sensor_ctrl.py --robot-ip <ROBOT_IP>` to verify that the sensor readings can control arm movement. Make sure to install [Polymetis](https://facebookresearch.github.io/fairo/polymetis/).
 
 
 ## License 
@@ -37,4 +37,3 @@ This work is licensed under a
 
 [cc-by]: https://creativecommons.org/licenses/by-nc/2.0/
 [cc-by-image]: https://i.creativecommons.org/l/by-nc/2.0/88x31.png
-

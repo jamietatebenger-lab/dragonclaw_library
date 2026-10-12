@@ -1,14 +1,20 @@
 #   Copyright (c) Meta Platforms, Inc. and affiliates.
 
-from dragonclaw_library.dragonclaw_sensor import DragonClawSensor
+import time
 
-sensor = DragonClawSensor("/dev/ttyACM0")
+from dragonclaw_library import DragonClaw
 
+
+claw = DragonClaw("/dev/ttyACM0")
 try:
     while True:
-        sensorData = sensor.read_sensor()
-
-        if sensorData is not None:
-            sensor.print_data(sensorData)
+        pressure_data = claw.read_press()
+        if pressure_data is None:
+            time.sleep(0.01)
+        else:
+            print(pressure_data)
 except KeyboardInterrupt:
-    sensor.stop()
+    pass
+finally:
+    claw.release()
+    claw.ser.close()
