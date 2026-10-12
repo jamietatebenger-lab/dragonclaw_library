@@ -30,7 +30,7 @@ class DragonClaw:
     stop_handler()
 
     '''
-    def __init__(self, comport="/dev/ttyACM0", baud=115200):
+    def __init__(self, comport="/dev/ttyACM0", baud=9600):
         self.ser = serial.Serial(comport, baud)
         if not self.ser.isOpen():
             raise Exception(

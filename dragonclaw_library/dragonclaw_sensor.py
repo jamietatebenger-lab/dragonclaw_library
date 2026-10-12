@@ -24,7 +24,7 @@ class DragonClawSensor:
     stop()
 
     '''
-    def __init__(self, comport="/dev/ttyACM0", baud=115200):
+    def __init__(self, comport="/dev/ttyACM0", baud=250000):
         self.ser = serial.Serial(comport, baud)
         # connected = self.client.connectToDevice(device=comport)
         if not self.ser.isOpen():
@@ -56,6 +56,8 @@ class DragonClawSensor:
             return None
 
         packet = self.ser.read(118)
+        if len(packet) != 118 or packet[-2:] != b"\r\n":
+            raise ValueError("Incomplete or invalid sensor packet")
         unpack_packet_tuple_full = struct.unpack("<29f", packet[0:-2])
         timestamp_qtpy = unpack_packet_tuple_full[0]
         unpack_packet_tuple = unpack_packet_tuple_full[1:]
@@ -97,4 +99,4 @@ class DragonClawSensor:
             return self.t_us, self.x_uT, self.y_uT, self.z_uT, self.mag_uT
 
     def stop(self):
-        self.ser.stop()
+        self.ser.close()
